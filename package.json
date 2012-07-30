@@ -8,7 +8,12 @@
 	"files": ["lib", "package.json"],
 	"dependencies": {
 		"coffee-script": "1.3.x",
-		"feedparser": "0.9.14"
+		"feedparser": "0.9.14",
+		"rss": "0.0.3"
 	}
+	"engines": {
+    "node": "0.8.x",
+    "npm":  "1.1.x"
+  }
 }
 
