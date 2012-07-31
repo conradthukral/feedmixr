@@ -8,6 +8,7 @@ urls = [
 ]
 
 server = http.createServer (request, response) ->
+	console.log "Request from #{request.socket.remoteAddress}"
 	feedcombiner.getCombinedArticles urls, (articles) ->
 		feed = new RSS
 			title: "Offenbach-Post Langen/Egelsbach"
