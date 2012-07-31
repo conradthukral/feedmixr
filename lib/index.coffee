@@ -15,11 +15,13 @@ server = http.createServer (request, response) ->
 
 		for article in articles
 			feed.item
-				url: article.url
+				url: article.link
 				guid: article.guid
 				date: article.date
 				title: article.title
 				description: article.description
+				author: article.author
+				categories: article.categories
 
 		response.setHeader "Content-Type", "application/rss+xml"
 		response.end feed.xml()
