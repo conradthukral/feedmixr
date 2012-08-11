@@ -10,7 +10,7 @@ String::startsWith = (prefix) ->
 feeds = [
 	{
 		url: '/op_egla'
-		sourcUrls:
+		sourceUrls:
 			[
 				'http://www.op-online.de/lokales/nachrichten/langen/rssfeed.rdf',
 				'http://www.op-online.de/lokales/nachrichten/egelsbach/rssfeed.rdf'
@@ -34,22 +34,20 @@ feeds = [
 app = express()
 app.set 'view engine', 'jade'
 
-for feedInfo in feeds
+registerFeed = (feedInfo) ->
 	console.log "Registering feed #{feedInfo.url}"
+	
 	app.get feedInfo.url, (request, response) ->
 		console.log "Request from #{request.socket.remoteAddress} for #{feedInfo.url}"
 	
-		generateFeedFor feedInfo, (feed) ->
+		feedcombiner.getCombinedArticles feedInfo.sourceUrls, feedInfo.filter, (articles) ->
+			rss = generateOutputFeed feedInfo.title, articles
 			response.setHeader "Content-Type", "application/rss+xml"
-			response.end feed.xml()
+			response.end rss.xml()
 
-app.get "/", (request, response) ->
-	response.render 'index', { feeds: feeds }
-
-generateFeedFor = (feedInfo, callback) ->
-	feedcombiner.getCombinedArticles feedInfo.sourceUrls, feedInfo.filter, (articles) ->
+generateOutputFeed = (title, articles) ->
 		feed = new RSS
-			title: feedInfo.title
+			title: title
 			site_url: 'http://www.op-online.de'
 
 		for article in articles
@@ -62,8 +60,12 @@ generateFeedFor = (feedInfo, callback) ->
 				author: article.author
 				categories: article.categories
 		
-		callback feed
+		feed
 
+app.get "/", (request, response) ->
+	response.render 'index', { feeds: feeds }
+
+registerFeed feedInfo for feedInfo in feeds
 
 port = process.env.PORT || 8080
 app.listen port, ->
