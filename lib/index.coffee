@@ -1,12 +1,14 @@
 feedcombiner = require './feedcombiner'
+
 RSS = require 'rss'
 http = require 'http'
+express = require 'express'
 
 String::startsWith = (prefix) ->
 	@substring(0, prefix.length) == prefix
 
 feeds =
-	'/op_egla':
+	'op_egla':
 		urls:
 			[
 				'http://www.op-online.de/lokales/nachrichten/langen/rssfeed.rdf',
@@ -14,7 +16,7 @@ feeds =
 			]
 		title: "Offenbach-Post Langen/Egelsbach"
 		filter: (article) -> true
-	'/op_dafrof':
+	'op_dafrof':
 		urls:
 			[
 				'http://www.op-online.de/lokales/nachrichten/rssfeed.rdf'
@@ -24,20 +26,16 @@ feeds =
 			text = article.description
 			text.startsWith("Darmstadt") or text.startsWith("Frankfurt") or text.startsWith("Offenbach")
 
+app = express()
 
-server = http.createServer (request, response) ->
-	url = require('url').parse request.url
-	feedInfo = feeds[url.pathname]
-
-	console.log "Request from #{request.socket.remoteAddress} for #{url.pathname}"
+for feedId, feedInfo of feeds
+	console.log "Registering feed /#{feedId}"
+	app.get "/#{feedId}", (request, response) ->
+		console.log "Request from #{request.socket.remoteAddress} for #{feedId}"
 	
-	if feedInfo
 		generateFeedFor feedInfo, (feed) ->
 			response.setHeader "Content-Type", "application/rss+xml"
 			response.end feed.xml()
-	else
-		response.statusCode = 404
-		response.end()
 
 generateFeedFor = (feedInfo, callback) ->
 	feedcombiner.getCombinedArticles feedInfo.urls, feedInfo.filter, (articles) ->
@@ -56,8 +54,9 @@ generateFeedFor = (feedInfo, callback) ->
 				categories: article.categories
 		
 		callback feed
-	
+
+
 port = process.env.PORT || 8080
-server.listen port, ->
+app.listen port, ->
 	console.log "Listening on #{port}"
 
