@@ -8,14 +8,15 @@ sortArticles = (allArticles) ->
 			return 1
 		article1.date - article2.date
 
-exports.getCombinedArticles = (urls, callback) ->
+exports.getCombinedArticles = (urls, filter, callback) ->
 	allArticles = []
 	doneCount = 0
 	integrateArticlesFromOneStream = (error, meta, articles) ->
 		if error
 			console.log "ERROR: #{error}"
 		else
-			allArticles.push article for article in articles
+			for article in articles
+				allArticles.push article if filter(article)
 		if ++doneCount == urls.length
 			sortArticles allArticles
 			callback allArticles
