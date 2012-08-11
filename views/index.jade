@@ -1,0 +1,12 @@
+!!! 5
+html
+  head
+    title feedmixr
+    body
+      h1 Welcome to feedmixr!
+      p Available feeds:
+      ul
+        for feedInfo in feeds
+          li
+            a(href=feedInfo.url)= feedInfo.title
+
