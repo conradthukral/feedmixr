@@ -22,7 +22,7 @@ feeds = [
 		url: '/op_dafrof'
 		sourceUrls:
 			[
-				'http://www.op-online.de/lokales/nachrichten/rssfeed.rdf'
+				'http://www.op-online.de/lokales/rhein-main/rssfeed.rdf'
 			]
 		title: "Offenbach-Post Darmstadt/Frankfurt/Offenbach"
 		filter: (article) ->
